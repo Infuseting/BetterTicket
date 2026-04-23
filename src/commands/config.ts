@@ -1,9 +1,10 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js';
 import { db } from '../db';
+import { t } from '../i18n';
 
 export const data = new SlashCommandBuilder()
 	.setName('config-staff')
-	.setDescription('Configure the staff role for this server')
+	.setDescription(t('config_staff_description', 'en'))
 	.addRoleOption(option => 
 		option.setName('role')
 			.setDescription('The staff role')
@@ -13,6 +14,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction) {
 	const role = interaction.options.getRole('role', true);
 	const guildId = interaction.guildId;
+	const locale = interaction.locale || 'en';
 
 	if (!guildId) {
 		await interaction.reply({ content: 'This command can only be used in a server.', ephemeral: true });
@@ -25,5 +27,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 		create: { guildId, staffRoleId: role.id },
 	});
 
-	await interaction.reply({ content: `Staff role set to ${role.name}`, ephemeral: true });
+	await interaction.reply({ 
+		content: t('config_staff_success', locale, { roleName: role.name }), 
+		ephemeral: true 
+	});
 }
