@@ -1,4 +1,10 @@
 {
   "ticket_created": "Your ticket has been created: {channelId}",
-  "role_assigned": "Role {roleId} has been assigned to you."
+  "role_assigned": "Role {roleId} has been assigned to you.",
+  "config_staff_description": "Configure the staff role for this server",
+  "config_staff_success": "Staff role set to {roleName}",
+  "ticket_setup_description": "Setup the ticket system in this channel",
+  "ticket_setup_embed_title": "Open a Ticket",
+  "ticket_setup_embed_description": "Click the button below to open a ticket.",
+  "ticket_setup_button_label": "Open Ticket"
 }
