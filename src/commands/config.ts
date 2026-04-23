@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder, MessageFlags } from 'discord.js';
 import { db } from '../db';
 import { t } from '../i18n';
 
@@ -30,7 +30,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 	const locale = interaction.locale || 'en';
 
 	if (!guildId) {
-		await interaction.reply({ content: 'This command can only be used in a server.', ephemeral: true });
+		await interaction.reply({ content: 'This command can only be used in a server.', flags: MessageFlags.Ephemeral });
 		return;
 	}
 
@@ -44,7 +44,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 		if (existing) {
 			await interaction.reply({ 
 				content: t('config_staff_already_exists', locale, { roleName: role.name }), 
-				ephemeral: true 
+				flags: MessageFlags.Ephemeral 
 			});
 			return;
 		}
@@ -55,7 +55,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 		await interaction.reply({ 
 			content: t('config_staff_add_success', locale, { roleName: role.name }), 
-			ephemeral: true 
+			flags: MessageFlags.Ephemeral 
 		});
 	} else if (subcommand === 'remove') {
 		const role = interaction.options.getRole('role', true);
@@ -67,7 +67,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 		if (!existing) {
 			await interaction.reply({ 
 				content: t('config_staff_not_found', locale, { roleName: role.name }), 
-				ephemeral: true 
+				flags: MessageFlags.Ephemeral 
 			});
 			return;
 		}
@@ -78,7 +78,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 		await interaction.reply({ 
 			content: t('config_staff_remove_success', locale, { roleName: role.name }), 
-			ephemeral: true 
+			flags: MessageFlags.Ephemeral 
 		});
 	} else if (subcommand === 'list') {
 		const roles = await db.staffRole.findMany({
@@ -88,7 +88,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 		if (roles.length === 0) {
 			await interaction.reply({ 
 				content: t('config_staff_list_empty', locale), 
-				ephemeral: true 
+				flags: MessageFlags.Ephemeral 
 			});
 			return;
 		}
@@ -102,7 +102,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 		await interaction.reply({
 			embeds: [embed],
-			ephemeral: true
+			flags: MessageFlags.Ephemeral
 		});
 	}
 }

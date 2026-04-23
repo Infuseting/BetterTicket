@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Events, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ModalActionRowComponentBuilder, ChannelType, PermissionFlagsBits, EmbedBuilder, ButtonBuilder, ButtonStyle, TextChannel } from 'discord.js';
+import { Client, GatewayIntentBits, Events, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ModalActionRowComponentBuilder, ChannelType, PermissionFlagsBits, EmbedBuilder, ButtonBuilder, ButtonStyle, TextChannel, MessageFlags } from 'discord.js';
 import dotenv from 'dotenv';
 import * as ping from './commands/ping';
 import * as config from './commands/config';
@@ -53,7 +53,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         });
 
         if (!ticket) {
-          await interaction.reply({ content: 'Ticket not found in database.', ephemeral: true });
+          await interaction.reply({ content: 'Ticket not found in database.', flags: MessageFlags.Ephemeral });
           return;
         }
 
@@ -93,7 +93,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         });
 
         if (!ticket) {
-          await interaction.reply({ content: 'Ticket not found in database.', ephemeral: true });
+          await interaction.reply({ content: 'Ticket not found in database.', flags: MessageFlags.Ephemeral });
           return;
         }
 
@@ -130,7 +130,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     if (interaction.isModalSubmit()) {
       if (interaction.customId === 'ticket_modal') {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         const subject = interaction.fields.getTextInputValue('ticket_subject');
         const description = interaction.fields.getTextInputValue('ticket_description');
@@ -230,9 +230,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     if (interaction.isRepliable()) {
       if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({ content: errorMessage, ephemeral: true });
+        await interaction.followUp({ content: errorMessage, flags: MessageFlags.Ephemeral });
       } else {
-        await interaction.reply({ content: errorMessage, ephemeral: true });
+        await interaction.reply({ content: errorMessage, flags: MessageFlags.Ephemeral });
       }
     }
   }
