@@ -7,8 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+model GuildConfig {
+  guildId      String @id
+  staffRoleId  String?
+}
+
+model Ticket {
+  id          Int      @id @default(autoincrement())
+  channelId   String   @unique
+  authorId    String
+  guildId     String
+  subject     String
+  description String
+  status      String   // OPEN, CLOSED
+  locale      String
+  createdAt   DateTime @default(now())
 }
