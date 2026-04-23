@@ -1,0 +1,4 @@
+{
+  "ticket_created": "Your ticket has been created: {channelId}",
+  "role_assigned": "Role {roleId} has been assigned to you."
+}
