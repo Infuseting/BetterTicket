@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Events, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ModalActionRowComponentBuilder, ChannelType, PermissionFlagsBits, EmbedBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { Client, GatewayIntentBits, Events, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ModalActionRowComponentBuilder, ChannelType, PermissionFlagsBits, EmbedBuilder, ButtonBuilder, ButtonStyle, TextChannel } from 'discord.js';
 import dotenv from 'dotenv';
 import * as ping from './commands/ping';
 import * as config from './commands/config';
@@ -43,6 +43,80 @@ client.on(Events.InteractionCreate, async (interaction) => {
       modal.addComponents(firstActionRow, secondActionRow);
 
       await interaction.showModal(modal);
+      return;
+    }
+
+    if (interaction.customId === 'close_ticket') {
+      const ticket = await db.ticket.findUnique({
+        where: { channelId: interaction.channelId }
+      });
+
+      if (!ticket) {
+        await interaction.reply({ content: 'Ticket not found in database.', ephemeral: true });
+        return;
+      }
+
+      await db.ticket.update({
+        where: { channelId: interaction.channelId },
+        data: { status: 'CLOSED' }
+      });
+
+      const channel = interaction.channel as TextChannel;
+      await channel.permissionOverwrites.edit(ticket.authorId, {
+        ViewChannel: false
+      });
+
+      const reopenButton = new ButtonBuilder()
+        .setCustomId('reopen_ticket')
+        .setLabel(t('ticket_reopen_button_label', interaction.locale))
+        .setStyle(ButtonStyle.Primary);
+
+      const archiveButton = new ButtonBuilder()
+        .setCustomId('archive_ticket')
+        .setLabel(t('ticket_archive_button_label', interaction.locale))
+        .setStyle(ButtonStyle.Danger);
+
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(reopenButton, archiveButton);
+
+      await interaction.reply({
+        content: t('ticket_closed_by', interaction.locale, { user: interaction.user.tag }),
+        components: [row]
+      });
+      return;
+    }
+
+    if (interaction.customId === 'reopen_ticket') {
+      const ticket = await db.ticket.findUnique({
+        where: { channelId: interaction.channelId }
+      });
+
+      if (!ticket) {
+        await interaction.reply({ content: 'Ticket not found in database.', ephemeral: true });
+        return;
+      }
+
+      await db.ticket.update({
+        where: { channelId: interaction.channelId },
+        data: { status: 'OPEN' }
+      });
+
+      const channel = interaction.channel as TextChannel;
+      await channel.permissionOverwrites.edit(ticket.authorId, {
+        ViewChannel: true,
+        SendMessages: true
+      });
+
+      await interaction.reply({
+        content: t('ticket_reopened_by', interaction.locale, { user: interaction.user.tag })
+      });
+      return;
+    }
+
+    if (interaction.customId === 'archive_ticket') {
+      await interaction.reply({ content: t('ticket_archiving', interaction.locale) });
+
+      const channel = interaction.channel as TextChannel;
+      await channel.delete();
       return;
     }
   }
