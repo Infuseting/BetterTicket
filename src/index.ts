@@ -63,7 +63,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
       const channel = interaction.channel as TextChannel;
       await channel.permissionOverwrites.edit(ticket.authorId, {
-        ViewChannel: false
+        ViewChannel: false,
+        SendMessages: false
       });
 
       const reopenButton = new ButtonBuilder()
