@@ -32,4 +32,4 @@ COPY --from=builder /app/prisma ./prisma
 # The bot doesn't expose any ports
 # ENV DATABASE_URL="file:./prisma/dev.db"
 
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
