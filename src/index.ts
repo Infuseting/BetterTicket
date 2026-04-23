@@ -116,6 +116,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (interaction.customId === 'archive_ticket') {
       await interaction.reply({ content: t('ticket_archiving', interaction.locale) });
 
+      await db.ticket.update({
+        where: { channelId: interaction.channelId },
+        data: { status: 'ARCHIVED' }
+      });
+
       const channel = interaction.channel as TextChannel;
       await channel.delete();
       return;
