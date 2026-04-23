@@ -12,6 +12,14 @@ model GuildConfig {
   staffRoleId  String?
 }
 
+model StaffRole {
+  id      Int    @id @default(autoincrement())
+  guildId String
+  roleId  String
+
+  @@unique([guildId, roleId])
+}
+
 model Ticket {
   id          Int      @id @default(autoincrement())
   channelId   String   @unique

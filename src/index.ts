@@ -138,12 +138,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         if (!guild) return;
 
-        // Get staff role from DB
-        const config = await db.guildConfig.findUnique({
+        // Get staff roles from DB
+        const staffRoles = await db.staffRole.findMany({
           where: { guildId: guild.id }
         });
-
-        const staffRoleId = config?.staffRoleId;
 
         // Permissions
         const permissionOverwrites: any[] = [
@@ -157,9 +155,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
           }
         ];
 
-        if (staffRoleId) {
+        for (const staffRole of staffRoles) {
           permissionOverwrites.push({
-            id: staffRoleId,
+            id: staffRole.roleId,
             allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages],
           });
         }
@@ -200,8 +198,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(closeButton);
 
+        const staffPings = staffRoles.map(r => `<@&${r.roleId}>`).join(' ');
+
         await channel.send({
-          content: `<@${interaction.user.id}> ${staffRoleId ? `<@&${staffRoleId}>` : ''}`,
+          content: `<@${interaction.user.id}> ${staffPings}`,
           embeds: [welcomeEmbed],
           components: [row]
         });
