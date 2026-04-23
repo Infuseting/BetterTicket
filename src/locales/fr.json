@@ -16,5 +16,10 @@
   "ticket_welcome_author": "Auteur : {author}",
   "ticket_welcome_description": "Description : {description}",
   "ticket_close_button_label": "Fermer le Ticket",
-  "ticket_created_success": "Ticket créé dans {channel}"
+  "ticket_created_success": "Ticket créé dans {channel}",
+  "ticket_closed_by": "Ticket fermé par {user}",
+  "ticket_reopen_button_label": "Réouvrir le Ticket",
+  "ticket_archive_button_label": "Archiver le Ticket",
+  "ticket_reopened_by": "Ticket réouvert par {user}",
+  "ticket_archiving": "Archivage du ticket..."
 }
