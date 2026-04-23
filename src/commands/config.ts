@@ -4,28 +4,27 @@ import { t } from '../i18n';
 
 export const data = new SlashCommandBuilder()
 	.setName('config-staff')
-	.setDescription(t('config_staff_description', 'en'))
+	.setDescription('Manage staff roles for tickets')
 	.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-	.addSubcommand(subcommand =>
-		subcommand
-			.setName('add')
-			.setDescription(t('config_staff_add_description', 'en'))
-			.addRoleOption(option => option.setName('role').setDescription('The role to add').setRequired(true))
+	.addStringOption(option =>
+		option.setName('action')
+			.setDescription('The action to perform')
+			.setRequired(true)
+			.addChoices(
+				{ name: 'Add', value: 'add' },
+				{ name: 'Remove', value: 'remove' },
+				{ name: 'List', value: 'list' }
+			)
 	)
-	.addSubcommand(subcommand =>
-		subcommand
-			.setName('remove')
-			.setDescription(t('config_staff_remove_description', 'en'))
-			.addRoleOption(option => option.setName('role').setDescription('The role to remove').setRequired(true))
-	)
-	.addSubcommand(subcommand =>
-		subcommand
-			.setName('list')
-			.setDescription(t('config_staff_list_description', 'en'))
+	.addRoleOption(option => 
+		option.setName('role')
+			.setDescription('The role to add or remove (not needed for list)')
+			.setRequired(false)
 	);
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-	const subcommand = interaction.options.getSubcommand();
+	const action = interaction.options.getString('action', true);
+	const role = interaction.options.getRole('role');
 	const guildId = interaction.guildId;
 	const locale = interaction.locale || 'en';
 
@@ -34,75 +33,86 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 		return;
 	}
 
-	if (subcommand === 'add') {
-		const role = interaction.options.getRole('role', true);
-		
-		const existing = await db.staffRole.findFirst({
-			where: { guildId, roleId: role.id }
-		});
+	try {
+		if (action === 'add') {
+			if (!role) {
+				await interaction.reply({ content: 'Please specify a role to add.', flags: MessageFlags.Ephemeral });
+				return;
+			}
+			
+			const existing = await db.staffRole.findFirst({
+				where: { guildId, roleId: role.id }
+			});
 
-		if (existing) {
+			if (existing) {
+				await interaction.reply({ 
+					content: t('config_staff_already_exists', locale, { roleName: role.name }), 
+					flags: MessageFlags.Ephemeral 
+				});
+				return;
+			}
+
+			await db.staffRole.create({
+				data: { guildId, roleId: role.id }
+			});
+
 			await interaction.reply({ 
-				content: t('config_staff_already_exists', locale, { roleName: role.name }), 
+				content: t('config_staff_add_success', locale, { roleName: role.name }), 
 				flags: MessageFlags.Ephemeral 
 			});
-			return;
-		}
+		} else if (action === 'remove') {
+			if (!role) {
+				await interaction.reply({ content: 'Please specify a role to remove.', flags: MessageFlags.Ephemeral });
+				return;
+			}
 
-		await db.staffRole.create({
-			data: { guildId, roleId: role.id }
-		});
+			const existing = await db.staffRole.findFirst({
+				where: { guildId, roleId: role.id }
+			});
 
-		await interaction.reply({ 
-			content: t('config_staff_add_success', locale, { roleName: role.name }), 
-			flags: MessageFlags.Ephemeral 
-		});
-	} else if (subcommand === 'remove') {
-		const role = interaction.options.getRole('role', true);
+			if (!existing) {
+				await interaction.reply({ 
+					content: t('config_staff_not_found', locale, { roleName: role.name }), 
+					flags: MessageFlags.Ephemeral 
+				});
+				return;
+			}
 
-		const existing = await db.staffRole.findFirst({
-			where: { guildId, roleId: role.id }
-		});
+			await db.staffRole.delete({
+				where: { id: existing.id }
+			});
 
-		if (!existing) {
 			await interaction.reply({ 
-				content: t('config_staff_not_found', locale, { roleName: role.name }), 
+				content: t('config_staff_remove_success', locale, { roleName: role.name }), 
 				flags: MessageFlags.Ephemeral 
 			});
-			return;
-		}
-
-		await db.staffRole.delete({
-			where: { id: existing.id }
-		});
-
-		await interaction.reply({ 
-			content: t('config_staff_remove_success', locale, { roleName: role.name }), 
-			flags: MessageFlags.Ephemeral 
-		});
-	} else if (subcommand === 'list') {
-		const roles = await db.staffRole.findMany({
-			where: { guildId }
-		});
-
-		if (roles.length === 0) {
-			await interaction.reply({ 
-				content: t('config_staff_list_empty', locale), 
-				flags: MessageFlags.Ephemeral 
+		} else if (action === 'list') {
+			const roles = await db.staffRole.findMany({
+				where: { guildId }
 			});
-			return;
+
+			if (roles.length === 0) {
+				await interaction.reply({ 
+					content: t('config_staff_list_empty', locale), 
+					flags: MessageFlags.Ephemeral 
+				});
+				return;
+			}
+
+			const roleList = roles.map(r => `<@&${r.roleId}>`).join('\n');
+			
+			const embed = new EmbedBuilder()
+				.setTitle(t('config_staff_list_title', locale))
+				.setDescription(roleList)
+				.setColor(0x0099FF);
+
+			await interaction.reply({
+				embeds: [embed],
+				flags: MessageFlags.Ephemeral
+			});
 		}
-
-		const roleList = roles.map(r => `<@&${r.roleId}>`).join('\n');
-		
-		const embed = new EmbedBuilder()
-			.setTitle(t('config_staff_list_title', locale))
-			.setDescription(roleList)
-			.setColor(0x0099FF);
-
-		await interaction.reply({
-			embeds: [embed],
-			flags: MessageFlags.Ephemeral
-		});
+	} catch (error) {
+		console.error('Error in config-staff command:', error);
+		await interaction.reply({ content: 'An error occurred while executing the command.', flags: MessageFlags.Ephemeral });
 	}
 }
