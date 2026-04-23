@@ -1,21 +1,24 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { t } from '../i18n';
 
 export const data = new SlashCommandBuilder()
 	.setName('ticket-setup')
-	.setDescription('Setup the ticket system in this channel')
+	.setDescription(t('ticket_setup_description', 'en'))
 	.setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+	const locale = interaction.locale || 'en';
+
 	const embed = new EmbedBuilder()
-		.setTitle('Open a Ticket')
-		.setDescription('Click the button below to open a ticket.')
+		.setTitle(t('ticket_setup_embed_title', locale))
+		.setDescription(t('ticket_setup_embed_description', locale))
 		.setColor(0x00FF00);
 
 	const row = new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(
 			new ButtonBuilder()
 				.setCustomId('open_ticket')
-				.setLabel('Open Ticket')
+				.setLabel(t('ticket_setup_button_label', locale))
 				.setStyle(ButtonStyle.Primary),
 		);
 
