@@ -4,7 +4,17 @@
   "config_staff_description": "Configurer le rôle du personnel pour ce serveur",
   "config_staff_success": "Rôle du personnel défini sur {roleName}",
   "ticket_setup_description": "Configurer le système de tickets dans ce salon",
-  "ticket_setup_embed_title": "Ouvrir un ticket",
+  "ticket_setup_embed_title": "Ouvrir un Ticket",
   "ticket_setup_embed_description": "Cliquez sur le bouton ci-dessous pour ouvrir un ticket.",
-  "ticket_setup_button_label": "Ouvrir un ticket"
+  "ticket_setup_button_label": "Ouvrir un Ticket",
+  "ticket_modal_title": "Ouvrir un Ticket",
+  "ticket_subject_label": "Sujet",
+  "ticket_subject_placeholder": "Décrivez brièvement votre problème",
+  "ticket_description_label": "Description",
+  "ticket_description_placeholder": "Donnez plus de détails sur votre problème",
+  "ticket_welcome_title": "Ticket : {subject}",
+  "ticket_welcome_author": "Auteur : {author}",
+  "ticket_welcome_description": "Description : {description}",
+  "ticket_close_button_label": "Fermer le Ticket",
+  "ticket_created_success": "Ticket créé dans {channel}"
 }

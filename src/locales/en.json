@@ -6,5 +6,15 @@
   "ticket_setup_description": "Setup the ticket system in this channel",
   "ticket_setup_embed_title": "Open a Ticket",
   "ticket_setup_embed_description": "Click the button below to open a ticket.",
-  "ticket_setup_button_label": "Open Ticket"
+  "ticket_setup_button_label": "Open Ticket",
+  "ticket_modal_title": "Open a Ticket",
+  "ticket_subject_label": "Subject",
+  "ticket_subject_placeholder": "Briefly describe your issue",
+  "ticket_description_label": "Description",
+  "ticket_description_placeholder": "Provide more details about your issue",
+  "ticket_welcome_title": "Ticket: {subject}",
+  "ticket_welcome_author": "Author: {author}",
+  "ticket_welcome_description": "Description: {description}",
+  "ticket_close_button_label": "Close Ticket",
+  "ticket_created_success": "Ticket created in {channel}"
 }
