@@ -7,4 +7,6 @@ services:
     env_file:
       - .env
     volumes:
-      - ./prisma:/app/prisma
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=file:/app/data/dev.db

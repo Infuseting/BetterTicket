@@ -29,6 +29,8 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
+RUN mkdir -p /app/data
+
 # The bot doesn't expose any ports
 # ENV DATABASE_URL="file:./prisma/dev.db"
 
