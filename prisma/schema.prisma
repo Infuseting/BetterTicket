@@ -12,22 +12,26 @@ model GuildConfig {
   staffRoleId  String?
 }
 
-model StaffRole {
-  id      Int    @id @default(autoincrement())
-  guildId String
+model Category {
+  id      String   @id @default(uuid())
+  name    String
+  emoji   String
   roleId  String
-
-  @@unique([guildId, roleId])
+  guildId String
+  tickets Ticket[]
 }
 
 model Ticket {
-  id          Int      @id @default(autoincrement())
-  channelId   String   @unique
+  id          String    @id @default(uuid())
+  channelId   String    @unique
   authorId    String
   guildId     String
   subject     String
   description String
-  status      String   // OPEN, CLOSED
-  locale      String
-  createdAt   DateTime @default(now())
+  status      String    @default("OPEN")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  locale      String    @default("en")
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
 }
