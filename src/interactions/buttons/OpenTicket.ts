@@ -1,5 +1,6 @@
-import { ButtonInteraction, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ModalActionRowComponentBuilder } from 'discord.js';
+import { ButtonInteraction, StringSelectMenuBuilder, ActionRowBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
 import { ButtonHandler } from '../../core/BaseHandler';
+import { db } from '../../db';
 import { t } from '../../i18n';
 
 export default class OpenTicket implements ButtonHandler {
@@ -7,31 +8,36 @@ export default class OpenTicket implements ButtonHandler {
 
   async execute(interaction: ButtonInteraction) {
     const locale = interaction.locale;
-    
-    // Create inputs first (minimal logic)
-    const subjectInput = new TextInputBuilder()
-      .setCustomId('ticket_subject')
-      .setLabel(t('ticket_subject_label', locale))
-      .setPlaceholder(t('ticket_subject_placeholder', locale))
-      .setStyle(TextInputStyle.Short)
-      .setRequired(true);
+    const categories = await db.category.findMany({
+      where: { guildId: interaction.guildId! }
+    });
 
-    const descriptionInput = new TextInputBuilder()
-      .setCustomId('ticket_description')
-      .setLabel(t('ticket_description_label', locale))
-      .setPlaceholder(t('ticket_description_placeholder', locale))
-      .setStyle(TextInputStyle.Paragraph)
-      .setRequired(true);
+    if (categories.length === 0) {
+      await interaction.reply({
+        content: t('no_categories', locale),
+        ephemeral: true
+      });
+      return;
+    }
 
-    const modal = new ModalBuilder()
-      .setCustomId('ticket_modal')
-      .setTitle(t('ticket_modal_title', locale))
-      .addComponents(
-        new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(subjectInput),
-        new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(descriptionInput)
+    const select = new StringSelectMenuBuilder()
+      .setCustomId('category_select')
+      .setPlaceholder('Select a category...')
+      .addOptions(
+        categories.map(cat => 
+          new StringSelectMenuOptionBuilder()
+            .setLabel(cat.name)
+            .setValue(cat.id)
+            .setEmoji(cat.emoji)
+        )
       );
 
-    // Show modal immediately
-    await interaction.showModal(modal);
+    const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);
+
+    await interaction.reply({
+      content: 'Please select a category for your ticket:',
+      components: [row],
+      ephemeral: true
+    });
   }
 }

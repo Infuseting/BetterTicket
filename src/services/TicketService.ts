@@ -7,10 +7,14 @@ export class TicketService {
     return db.ticket.findUnique({ where: { channelId } });
   }
 
-  async createTicket(user: User, guild: Guild, subject: string, description: string, locale: Locale) {
-    const staffRoles = await db.staffRole.findMany({
-      where: { guildId: guild.id }
+  async createTicket(user: User, guild: Guild, subject: string, description: string, locale: Locale, categoryId: string) {
+    const category = await db.category.findUnique({
+      where: { id: categoryId }
     });
+
+    if (!category) {
+      throw new Error('Category not found');
+    }
 
     const permissionOverwrites: any[] = [
       {
@@ -20,15 +24,12 @@ export class TicketService {
       {
         id: user.id,
         allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages],
+      },
+      {
+        id: category.roleId,
+        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages],
       }
     ];
-
-    for (const staffRole of staffRoles) {
-      permissionOverwrites.push({
-        id: staffRole.roleId,
-        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages],
-      });
-    }
 
     const channel = await guild.channels.create({
       name: `ticket-${user.username}`,
@@ -44,7 +45,8 @@ export class TicketService {
         subject,
         description,
         status: 'OPEN',
-        locale
+        locale,
+        categoryId: category.id
       }
     });
 
@@ -62,10 +64,10 @@ export class TicketService {
       .setStyle(ButtonStyle.Danger);
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(closeButton);
-    const staffPings = staffRoles.map(r => `<@&${r.roleId}>`).join(' ');
+    const staffPing = `<@&${category.roleId}>`;
 
     await channel.send({
-      content: `<@${user.id}> ${staffPings}`,
+      content: `<@${user.id}> ${staffPing}`,
       embeds: [welcomeEmbed],
       components: [row]
     });
