@@ -21,8 +21,9 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Install openssl for Prisma
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+# Install openssl for Prisma and disable npm update notifier
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/* && \
+    npm config set update-notifier false
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
