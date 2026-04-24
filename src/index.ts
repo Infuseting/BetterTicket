@@ -1,8 +1,8 @@
 import { Client, GatewayIntentBits, Events, MessageFlags } from 'discord.js';
 import dotenv from 'dotenv';
-import * as ping from './commands/ping';
-import * as config from './commands/config';
-import * as setup from './commands/setup';
+import PingCommand from './commands/ping';
+import ConfigStaffCommand from './commands/config';
+import SetupCommand from './commands/setup';
 import { interactionManager } from './core/InteractionManager';
 
 dotenv.config();
@@ -10,6 +10,10 @@ dotenv.config();
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
 });
+
+const ping = new PingCommand();
+const config = new ConfigStaffCommand();
+const setup = new SetupCommand();
 
 client.once(Events.ClientReady, async (c) => {
   await interactionManager.loadInteractions();

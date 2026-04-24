@@ -1,9 +1,12 @@
-import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { CommandHandler } from '../core/BaseHandler';
 
-export const data = new SlashCommandBuilder()
-	.setName('ping')
-	.setDescription('Replies with Pong!');
+export default class PingCommand implements CommandHandler {
+	data = new SlashCommandBuilder()
+		.setName('ping')
+		.setDescription('Replies with Pong!');
 
-export async function execute(interaction: CommandInteraction) {
-	await interaction.reply('Pong!');
+	async execute(interaction: ChatInputCommandInteraction) {
+		await interaction.reply('Pong!');
+	}
 }
