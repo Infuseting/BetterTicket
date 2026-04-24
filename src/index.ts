@@ -1,8 +1,5 @@
 import { Client, GatewayIntentBits, Events, MessageFlags } from 'discord.js';
 import dotenv from 'dotenv';
-import PingCommand from './commands/ping';
-import ConfigStaffCommand from './commands/config';
-import SetupCommand from './commands/setup';
 import { interactionManager } from './core/InteractionManager';
 
 dotenv.config();
@@ -11,10 +8,6 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
 });
 
-const ping = new PingCommand();
-const config = new ConfigStaffCommand();
-const setup = new SetupCommand();
-
 client.once(Events.ClientReady, async (c) => {
   await interactionManager.loadInteractions();
   console.log(`Ready! Logged in as ${c.user.tag}`);
@@ -22,31 +15,15 @@ client.once(Events.ClientReady, async (c) => {
 
 client.on(Events.InteractionCreate, async (interaction) => {
   try {
-    if (interaction.isButton()) {
+    if (interaction.isChatInputCommand()) {
+      await interactionManager.handleCommand(interaction);
+    } else if (interaction.isButton()) {
       await interactionManager.handleButton(interaction);
-      return;
-    }
-
-    if (interaction.isModalSubmit()) {
+    } else if (interaction.isModalSubmit()) {
       await interactionManager.handleModal(interaction);
-      return;
-    }
-
-    if (!interaction.isChatInputCommand()) return;
-
-    const { commandName } = interaction;
-
-    if (commandName === ping.data.name) {
-      await ping.execute(interaction);
-    } else if (commandName === config.data.name) {
-      await config.execute(interaction);
-    } else if (commandName === setup.data.name) {
-      await setup.execute(interaction);
     }
   } catch (error) {
     console.error('Interaction error:', error);
-    
-    // Don't crash the bot if error reporting fails
     try {
       if (interaction.isRepliable()) {
         const errorMessage = 'There was an error while executing this interaction!';
