@@ -21,6 +21,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       await interactionManager.handleButton(interaction);
     } else if (interaction.isModalSubmit()) {
       await interactionManager.handleModal(interaction);
+    } else if (interaction.isStringSelectMenu()) {
+      await interactionManager.handleSelect(interaction);
     }
   } catch (error) {
     console.error('Interaction error:', error);

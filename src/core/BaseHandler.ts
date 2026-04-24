@@ -1,4 +1,4 @@
-import { ButtonInteraction, ChatInputCommandInteraction, ModalSubmitInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
+import { ButtonInteraction, ChatInputCommandInteraction, ModalSubmitInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder, StringSelectMenuInteraction } from 'discord.js';
 
 export interface CommandHandler {
   data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
@@ -13,4 +13,9 @@ export interface ButtonHandler {
 export interface ModalHandler {
   customId: string;
   execute(interaction: ModalSubmitInteraction): Promise<void>;
+}
+
+export interface SelectMenuHandler {
+  customId: string;
+  execute(interaction: StringSelectMenuInteraction): Promise<void>;
 }
