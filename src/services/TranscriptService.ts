@@ -78,7 +78,7 @@ export class TranscriptService {
           } else {
             attachmentsHtml += `
               <a href="${attachment.url}" target="_blank" class="flex items-center gap-2 bg-[#2b2d31] border border-[#41434a] p-3 rounded-lg hover:bg-[#35373c] transition-colors text-sm text-[#00A8FC]">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="浸.172-2.172a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 115.656-5.656L10 8.828l1.414 1.414-1.414 1.414z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172-2.172a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 115.656-5.656L10 8.828l1.414 1.414-1.414 1.414z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 ${this.escapeHtml(attachment.name || 'Download Attachment')}
               </a>`;
           }
