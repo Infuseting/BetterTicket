@@ -33,10 +33,18 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 		return;
 	}
 
+	// Defer immediately to give us more time (3s -> 15min)
+	try {
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+	} catch (error) {
+		console.error('Failed to defer config command:', error);
+		return;
+	}
+
 	try {
 		if (action === 'add') {
 			if (!role) {
-				await interaction.reply({ content: 'Please specify a role to add.', flags: MessageFlags.Ephemeral });
+				await interaction.editReply({ content: 'Please specify a role to add.' });
 				return;
 			}
 			
@@ -45,9 +53,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 			});
 
 			if (existing) {
-				await interaction.reply({ 
-					content: t('config_staff_already_exists', locale, { roleName: role.name }), 
-					flags: MessageFlags.Ephemeral 
+				await interaction.editReply({ 
+					content: t('config_staff_already_exists', locale, { roleName: role.name })
 				});
 				return;
 			}
@@ -56,13 +63,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 				data: { guildId, roleId: role.id }
 			});
 
-			await interaction.reply({ 
-				content: t('config_staff_add_success', locale, { roleName: role.name }), 
-				flags: MessageFlags.Ephemeral 
+			await interaction.editReply({ 
+				content: t('config_staff_add_success', locale, { roleName: role.name })
 			});
 		} else if (action === 'remove') {
 			if (!role) {
-				await interaction.reply({ content: 'Please specify a role to remove.', flags: MessageFlags.Ephemeral });
+				await interaction.editReply({ content: 'Please specify a role to remove.' });
 				return;
 			}
 
@@ -71,9 +77,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 			});
 
 			if (!existing) {
-				await interaction.reply({ 
-					content: t('config_staff_not_found', locale, { roleName: role.name }), 
-					flags: MessageFlags.Ephemeral 
+				await interaction.editReply({ 
+					content: t('config_staff_not_found', locale, { roleName: role.name })
 				});
 				return;
 			}
@@ -82,9 +87,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 				where: { id: existing.id }
 			});
 
-			await interaction.reply({ 
-				content: t('config_staff_remove_success', locale, { roleName: role.name }), 
-				flags: MessageFlags.Ephemeral 
+			await interaction.editReply({ 
+				content: t('config_staff_remove_success', locale, { roleName: role.name })
 			});
 		} else if (action === 'list') {
 			const roles = await db.staffRole.findMany({
@@ -92,9 +96,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 			});
 
 			if (roles.length === 0) {
-				await interaction.reply({ 
-					content: t('config_staff_list_empty', locale), 
-					flags: MessageFlags.Ephemeral 
+				await interaction.editReply({ 
+					content: t('config_staff_list_empty', locale)
 				});
 				return;
 			}
@@ -106,13 +109,16 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 				.setDescription(roleList)
 				.setColor(0x0099FF);
 
-			await interaction.reply({
-				embeds: [embed],
-				flags: MessageFlags.Ephemeral
+			await interaction.editReply({
+				embeds: [embed]
 			});
 		}
 	} catch (error) {
 		console.error('Error in config-staff command:', error);
-		await interaction.reply({ content: 'An error occurred while executing the command.', flags: MessageFlags.Ephemeral });
+		try {
+			await interaction.editReply({ content: 'An error occurred while executing the command.' });
+		} catch (innerError) {
+			console.error('Failed to send error message:', innerError);
+		}
 	}
 }
