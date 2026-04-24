@@ -70,7 +70,7 @@ describe('TranscriptService', () => {
     expect(htmlContent).toContain('&lt;script&gt;');
   });
 
-  it('should parse mentions', async () => {
+  it('should parse mentions and resolve names from cache', async () => {
     const mockMessages = new Collection<string, any>([
       ['1', { 
         id: '1',
@@ -83,6 +83,11 @@ describe('TranscriptService', () => {
 
     const mockChannel = {
       name: 'mention-channel',
+      guild: {
+        members: { cache: new Collection([['123', { displayName: 'John Doe' }]]) },
+        roles: { cache: new Collection([['456', { name: 'Admin' }]]) },
+        channels: { cache: new Collection([['789', { name: 'general' }]]) },
+      },
       messages: {
         fetch: vi.fn().mockResolvedValueOnce(mockMessages),
       },
@@ -92,16 +97,16 @@ describe('TranscriptService', () => {
     const htmlContent = result.toString();
 
     expect(htmlContent).toContain('bg-[#5865F2]/10'); // User mention style
-    expect(htmlContent).toContain('@123');
+    expect(htmlContent).toContain('@John Doe');
     expect(htmlContent).toContain('bg-[#43B581]/10'); // Role mention style
-    expect(htmlContent).toContain('@456');
-    expect(htmlContent).toContain('#789');
+    expect(htmlContent).toContain('@Admin');
+    expect(htmlContent).toContain('#general');
   });
 
-  it('should render image attachments', async () => {
+  it('should render image attachments and escape URLs', async () => {
     const mockAttachments = new Collection<string, any>([
       ['a1', { 
-        url: 'https://example.com/image.png', 
+        url: 'https://example.com/image.png?x="><script>alert(1)</script>', 
         contentType: 'image/png',
         name: 'image.png'
       }],
@@ -127,7 +132,7 @@ describe('TranscriptService', () => {
     const result = await transcriptService.generate(mockChannel);
     const htmlContent = result.toString();
 
-    expect(htmlContent).toContain('<img src="https://example.com/image.png"');
+    expect(htmlContent).toContain('src="https://example.com/image.png?x=&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"');
   });
 
   it('should fetch more than 100 messages (pagination)', async () => {
