@@ -28,7 +28,7 @@ export default class CategorySelect implements SelectMenuHandler {
         interaction.user,
         interaction.guild!,
         category.name,
-        "No description provided",
+        t('no_description_provided', interaction.locale),
         interaction.locale,
         category.id
       );
@@ -39,7 +39,7 @@ export default class CategorySelect implements SelectMenuHandler {
     } catch (error) {
       console.error('Error creating ticket:', error);
       await interaction.editReply({
-        content: 'An error occurred while creating your ticket.'
+        content: t('ticket_creation_error', interaction.locale)
       });
     }
   }

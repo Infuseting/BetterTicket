@@ -19,8 +19,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
       await interactionManager.handleCommand(interaction);
     } else if (interaction.isButton()) {
       await interactionManager.handleButton(interaction);
-    } else if (interaction.isModalSubmit()) {
-      await interactionManager.handleModal(interaction);
     } else if (interaction.isStringSelectMenu()) {
       await interactionManager.handleSelect(interaction);
     }

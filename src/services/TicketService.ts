@@ -52,10 +52,7 @@ export class TicketService {
 
     const welcomeEmbed = new EmbedBuilder()
       .setTitle(t('ticket_welcome_title', locale, { subject }))
-      .addFields(
-        { name: t('ticket_subject_label', locale), value: subject },
-        { name: t('ticket_description_label', locale), value: description }
-      )
+      .setDescription(t('ticket_welcome_description', locale, { category: subject }))
       .setColor(0x00FF00);
 
     const closeButton = new ButtonBuilder()

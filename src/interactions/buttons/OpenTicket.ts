@@ -22,7 +22,7 @@ export default class OpenTicket implements ButtonHandler {
 
     const select = new StringSelectMenuBuilder()
       .setCustomId('category_select')
-      .setPlaceholder('Select a category...')
+      .setPlaceholder(t('category_select_placeholder', locale))
       .addOptions(
         categories.map(cat => 
           new StringSelectMenuOptionBuilder()
@@ -35,7 +35,7 @@ export default class OpenTicket implements ButtonHandler {
     const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);
 
     await interaction.reply({
-      content: 'Please select a category for your ticket:',
+      content: t('category_select_content', locale),
       components: [row],
       ephemeral: true
     });

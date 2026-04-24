@@ -1,17 +1,15 @@
-import { ButtonInteraction, ModalSubmitInteraction, ChatInputCommandInteraction, Collection, StringSelectMenuInteraction } from 'discord.js';
-import { ButtonHandler, ModalHandler, CommandHandler, SelectMenuHandler } from './BaseHandler';
+import { ButtonInteraction, ChatInputCommandInteraction, Collection, StringSelectMenuInteraction } from 'discord.js';
+import { ButtonHandler, CommandHandler, SelectMenuHandler } from './BaseHandler';
 import path from 'path';
 import fs from 'fs';
 
 export class InteractionManager {
   private buttons = new Collection<string, ButtonHandler>();
-  private modals = new Collection<string, ModalHandler>();
   private commands = new Collection<string, CommandHandler>();
   private selects = new Collection<string, SelectMenuHandler>();
 
   async loadInteractions() {
     await this.loadHandlers('../interactions/buttons', this.buttons, 'customId');
-    await this.loadHandlers('../interactions/modals', this.modals, 'customId');
     await this.loadHandlers('../interactions/selects', this.selects, 'customId');
     await this.loadHandlers('../commands', this.commands, 'name', true);
   }
@@ -34,11 +32,6 @@ export class InteractionManager {
 
   async handleButton(interaction: ButtonInteraction) {
     const handler = this.buttons.get(interaction.customId);
-    if (handler) await handler.execute(interaction);
-  }
-
-  async handleModal(interaction: ModalSubmitInteraction) {
-    const handler = this.modals.get(interaction.customId);
     if (handler) await handler.execute(interaction);
   }
 
