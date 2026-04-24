@@ -34,10 +34,10 @@ describe('TranscriptService', () => {
       },
     } as unknown as TextChannel;
 
-    const result = await transcriptService.generate(mockChannel);
+    const { buffer } = await transcriptService.generate(mockChannel);
 
-    expect(result).toBeInstanceOf(Buffer);
-    const htmlContent = result.toString();
+    expect(buffer).toBeInstanceOf(Buffer);
+    const htmlContent = buffer.toString();
     expect(htmlContent).toContain('Transcript for #test-channel');
     expect(htmlContent).toContain('Hello');
     expect(htmlContent).toContain('World');
@@ -63,8 +63,8 @@ describe('TranscriptService', () => {
       },
     } as unknown as TextChannel;
 
-    const result = await transcriptService.generate(mockChannel);
-    const htmlContent = result.toString();
+    const { buffer } = await transcriptService.generate(mockChannel);
+    const htmlContent = buffer.toString();
 
     expect(htmlContent).not.toContain('<script>');
     expect(htmlContent).toContain('&lt;script&gt;');
@@ -93,8 +93,8 @@ describe('TranscriptService', () => {
       },
     } as unknown as TextChannel;
 
-    const result = await transcriptService.generate(mockChannel);
-    const htmlContent = result.toString();
+    const { buffer } = await transcriptService.generate(mockChannel);
+    const htmlContent = buffer.toString();
 
     expect(htmlContent).toContain('bg-[#5865F2]/10'); // User mention style
     expect(htmlContent).toContain('@John Doe');
@@ -129,8 +129,8 @@ describe('TranscriptService', () => {
       },
     } as unknown as TextChannel;
 
-    const result = await transcriptService.generate(mockChannel);
-    const htmlContent = result.toString();
+    const { buffer } = await transcriptService.generate(mockChannel);
+    const htmlContent = buffer.toString();
 
     expect(htmlContent).toContain('src="https://example.com/image.png?x=&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"');
   });
@@ -167,8 +167,8 @@ describe('TranscriptService', () => {
       },
     } as unknown as TextChannel;
 
-    const result = await transcriptService.generate(mockChannel);
-    const htmlContent = result.toString();
+    const { buffer } = await transcriptService.generate(mockChannel);
+    const htmlContent = buffer.toString();
 
     expect(htmlContent).toContain('Msg 0');
     expect(htmlContent).toContain('Msg 99');

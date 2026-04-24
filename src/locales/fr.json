@@ -30,5 +30,19 @@
   "ticket_reopen_button_label": "Réouvrir le Ticket",
   "ticket_archive_button_label": "Archiver le Ticket",
   "ticket_reopened_by": "Ticket réouvert par {user}",
-  "ticket_archiving": "Archivage du ticket..."
+  "ticket_archiving": "Archivage du ticket...",
+  "ticket_transcript_attached": "Le transcript est joint à ce message.",
+  "ticket_transcript_sent_dm": "Le transcript a été envoyé à {user}.",
+  "ticket_transcript_dm_failed": "Impossible d'envoyer le transcript à {user} (les MPs sont peut-être bloqués).",
+  "ticket_owner": "Propriétaire du ticket",
+  "ticket_name": "Nom du ticket",
+  "ticket_channel": "Salon",
+  "ticket_panel": "Nom du panel",
+  "ticket_transcript_users": "Utilisateurs dans le transcript",
+  "ticket_transcript_direct": "Transcript direct",
+  "ticket_none": "Aucun",
+  "transcript_title": "Transcript pour #{channel}",
+  "transcript_generated_on": "Généré le {date}",
+  "transcript_download_attachment": "Télécharger la pièce jointe",
+  "transcript_end": "Fin du transcript pour #{channel}"
 }

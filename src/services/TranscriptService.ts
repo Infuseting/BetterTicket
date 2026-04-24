@@ -1,4 +1,10 @@
-import { TextChannel, Message, Collection } from 'discord.js';
+import { TextChannel, Message, Collection, FetchMessagesOptions } from 'discord.js';
+import { t } from '../i18n';
+
+export interface TranscriptResult {
+  buffer: Buffer;
+  participantIds: Set<string>;
+}
 
 export class TranscriptService {
   private static readonly MENTION_CLASSES = {
@@ -38,12 +44,12 @@ export class TranscriptService {
     return content;
   }
 
-  async generate(channel: TextChannel): Promise<Buffer> {
+  async generate(channel: TextChannel, locale: string = 'en'): Promise<TranscriptResult> {
     const allMessages: Message[] = [];
     let lastId: string | undefined;
 
     while (true) {
-      const options: any = { limit: 100 };
+      const options: FetchMessagesOptions = { limit: 100 };
       if (lastId) options.before = lastId;
 
       const messages: Collection<string, Message> = await channel.messages.fetch(options);
@@ -56,14 +62,15 @@ export class TranscriptService {
     }
 
     const sortedMessages = allMessages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    const participantIds = new Set(allMessages.map(m => m.author.id));
 
     let html = `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${locale}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transcript - ${this.escapeHtml(channel.name)}</title>
+    <title>${t('transcript_title', locale, { channel: channel.name })}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #313338; color: #DBDEE1; }
@@ -73,8 +80,8 @@ export class TranscriptService {
 <body class="font-sans antialiased">
     <div class="max-w-4xl mx-auto p-4 md:p-8">
         <div class="border-b border-[#41434a] pb-6 mb-8">
-            <h1 class="text-3xl font-bold text-white mb-2">Transcript for #${this.escapeHtml(channel.name)}</h1>
-            <p class="text-[#949BA4]">Generated on ${new Date().toLocaleString()}</p>
+            <h1 class="text-3xl font-bold text-white mb-2">${t('transcript_title', locale, { channel: channel.name })}</h1>
+            <p class="text-[#949BA4]">${t('transcript_generated_on', locale, { date: new Date().toLocaleString() })}</p>
         </div>
 
         <div id="messages" class="space-y-4">
@@ -98,7 +105,7 @@ export class TranscriptService {
             attachmentsHtml += `
               <a href="${escapedUrl}" target="_blank" class="flex items-center gap-2 bg-[#2b2d31] border border-[#41434a] p-3 rounded-lg hover:bg-[#35373c] transition-colors text-sm text-[#00A8FC]">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172-2.172a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 115.656-5.656L10 8.828l1.414 1.414-1.414 1.414z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                ${this.escapeHtml(attachment.name || 'Download Attachment')}
+                ${this.escapeHtml(attachment.name || t('transcript_download_attachment', locale))}
               </a>`;
           }
         }
@@ -120,14 +127,17 @@ export class TranscriptService {
     html += `
         </div>
         <div class="mt-12 pt-8 border-t border-[#41434a] text-center text-xs text-[#949BA4]">
-            End of transcript for #${this.escapeHtml(channel.name)}
+            ${t('transcript_end', locale, { channel: channel.name })}
         </div>
     </div>
 </body>
 </html>
 `;
 
-    return Buffer.from(html);
+    return {
+      buffer: Buffer.from(html),
+      participantIds
+    };
   }
 }
 
