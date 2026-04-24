@@ -41,14 +41,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
   } catch (error) {
     console.error('Interaction error:', error);
-    const errorMessage = 'There was an error while executing this interaction!';
-
-    if (interaction.isRepliable()) {
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({ content: errorMessage, flags: MessageFlags.Ephemeral });
-      } else {
-        await interaction.reply({ content: errorMessage, flags: MessageFlags.Ephemeral });
+    
+    // Don't crash the bot if error reporting fails
+    try {
+      if (interaction.isRepliable()) {
+        const errorMessage = 'There was an error while executing this interaction!';
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp({ content: errorMessage, flags: MessageFlags.Ephemeral });
+        } else {
+          await interaction.reply({ content: errorMessage, flags: MessageFlags.Ephemeral });
+        }
       }
+    } catch (innerError) {
+      console.error('Failed to send error message to user:', innerError);
     }
   }
 });

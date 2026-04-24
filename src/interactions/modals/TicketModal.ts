@@ -7,7 +7,12 @@ export default class TicketModal implements ModalHandler {
   customId = 'ticket_modal';
 
   async execute(interaction: ModalSubmitInteraction) {
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    try {
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    } catch (error) {
+      console.error('Failed to defer modal interaction:', error);
+      return;
+    }
 
     const subject = interaction.fields.getTextInputValue('ticket_subject');
     const description = interaction.fields.getTextInputValue('ticket_description');
