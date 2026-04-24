@@ -1,6 +1,7 @@
 import { Client, GatewayIntentBits, Events, MessageFlags } from 'discord.js';
 import dotenv from 'dotenv';
 import { interactionManager } from './core/InteractionManager';
+import { presenceService } from './services/PresenceService';
 
 dotenv.config();
 
@@ -10,6 +11,7 @@ const client = new Client({
 
 client.once(Events.ClientReady, async (c) => {
   await interactionManager.loadInteractions();
+  presenceService.start(c);
   console.log(`Ready! Logged in as ${c.user.tag}`);
 });
 
